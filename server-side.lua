@@ -247,6 +247,8 @@ local Weapons = {
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- WEAPONDAMAGEEVENT
 -----------------------------------------------------------------------------------------------------------------------------------------
+---@param Sender string   -- String do source do usuário que causou dano
+---@param Data table      -- Tabela com as informações do dano causado, como a qual source, quantidade de dano, arma, região atingida, etc.
 AddEventHandler("weaponDamageEvent",function(Sender,Data)
     -- Implementar verificação se o jogador está em jogo para execução do código, juntamente com as informações da partida
     if Sender then
