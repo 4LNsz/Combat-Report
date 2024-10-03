@@ -62,13 +62,13 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- DWTEXT
 -----------------------------------------------------------------------------------------------------------------------------------------
----@param Index string      -- Texto que irá identificar sua posição na interface
----@param Text table        -- Texto que deverá ser mostrado
----@param r table           -- Coloração R
----@param g table           -- Coloração G
----@param b table           -- Coloração B
----@param a table           -- Alpha
----@param Number table      -- Número de jogador está sendo referido (sistema automitizado para se comportar melhor quando tiver mais jogadores na lista)
+---@param Index string       -- Texto que irá identificar sua posição na interface
+---@param Text string        -- Texto que deverá ser mostrado
+---@param r number           -- Coloração R
+---@param g number           -- Coloração G
+---@param b number           -- Coloração B
+---@param a number           -- Alpha
+---@param Number number      -- Número de jogador está sendo referido (sistema automitizado para se comportar melhor quando tiver mais jogadores na lista)
 local function DwText(Index,Text,r,g,b,a,Number)
 	local Split = splitString(Index,"-")
 	local Primary = Split[1]
