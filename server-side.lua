@@ -1,3 +1,6 @@
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- GAMES
+-----------------------------------------------------------------------------------------------------------------------------------------
 Games = {
     data = {
         ['matchmaking-01'] = {
@@ -178,7 +181,7 @@ local Weapons = {
 	[`WEAPON_MILITARYRIFLE`] = "WEAPON_MILITARYRIFLE",
 	[`WEAPON_HEAVYRIFLE`] = "WEAPON_HEAVYRIFLE",
     [`WEAPON_TACTICALRIFLE`] = "WEAPON_TACTICALRIFLE",
-    
+
     -- LIGHT MACHINE GUNS
 	[`WEAPON_MG`] = "WEAPON_MG",
 	[`WEAPON_COMBATMG`] = "WEAPON_COMBATMG",
@@ -247,7 +250,7 @@ local Weapons = {
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- WEAPONDAMAGEEVENT
 -----------------------------------------------------------------------------------------------------------------------------------------
----@param Sender string   -- String do source do usuário que causou dano
+---@param Sender string   -- Source do usuário que causou dano
 ---@param Data table      -- Tabela com as informações do dano causado, como a qual source, quantidade de dano, arma, região atingida, etc.
 AddEventHandler("weaponDamageEvent",function(Sender,Data)
     -- Implementar verificação se o jogador está em jogo para execução do código, juntamente com as informações da partida
@@ -255,14 +258,16 @@ AddEventHandler("weaponDamageEvent",function(Sender,Data)
         local Network = NetworkGetEntityFromNetworkId(Data["hitGlobalId"])
         local Source = NetworkGetEntityOwner(Network)
 
-		-- Formatação, caso o `Sender` precise ser `number`, invés de `string`
+		-- Formatação, caso o `Sender` precise ser `number`, ao invés de `string`
 		Sender = tonumber(Sender)
 
-        -- Implementar verificação se o jogador está em jogo para execução do código
         if GetEntityHealth(Network) > 101 then
 			local Match = "matchmaking-01"
 			local Round = Games["data"][Match]["rounds"]["current"]
-			local Nick = Games["data"][Match]["players"]["data"]["attackers"][Sender] and Games["data"][Match]["players"]["data"]["attackers"][Sender]["nick"] or Games["data"][Match]["players"]["data"]["defenders"][Sender]["nick"]
+
+			-- Caso Sender seja `string`, será necessário utilizar a verificação comentada
+			local Nick = Games["data"][Match]["players"]["data"]["attackers"][Sender] and Games["data"][Match]["players"]["data"]["attackers"][Sender]["nick"] or Games["data"][Match]["players"]["data"]["defenders"][Sender]["nick"] -- Games["data"][Match]["players"]["data"]["attackers"][tonumber(Sender)] and Games["data"][Match]["players"]["data"]["attackers"][tonumber(Sender)]["nick"] or Games["data"][Match]["players"]["data"]["defenders"][tonumber(Sender)]["nick"]
+			local Icon = "Icon"
 			local Hit = Bones[tostring(Data["hitComponent"])] or Data["hitComponent"]
 			local Weapon = Weapons[Data["weaponType"]] or Data["weaponType"]
 
@@ -284,7 +289,7 @@ AddEventHandler("weaponDamageEvent",function(Sender,Data)
 			if not Games["data"][Match]["rounds"]["data"][Round][Sender][Source] then
 				Games["data"][Match]["rounds"]["data"][Round][Sender][Source] = {
 					["Nick"] = Nick,
-					["Icon"] = "Icon",
+					["Icon"] = Icon,
 					["Taken"] = {
 						["Total"] = 0,
 						["Head"] = {
@@ -325,7 +330,7 @@ AddEventHandler("weaponDamageEvent",function(Sender,Data)
 			if not Games["data"][Match]["rounds"]["data"][Round][Source][Sender] then
 				Games["data"][Match]["rounds"]["data"][Round][Source][Sender] = {
 					["Nick"] = Nick,
-					["Icon"] = "Icon",
+					["Icon"] = Icon,
 					["Taken"] = {
 						["Total"] = 0,
 						["Head"] = {
@@ -369,104 +374,124 @@ AddEventHandler("weaponDamageEvent",function(Sender,Data)
 			Games["data"][Match]["rounds"]["data"][Round][Source][Sender]["Taken"][Hit]["Hits"][#Games["data"][Match]["rounds"]["data"][Round][Source][Sender]["Taken"][Hit]["Hits"] + 1] = Infos
 
 			-- DEBUG
-			-- for Number = 1,4 do
-			-- 	local Nick = Games["data"][Match]["players"]["data"]["attackers"][Number] and Games["data"][Match]["players"]["data"]["attackers"][Number]["nick"] or Games["data"][Match]["players"]["data"]["defenders"][Number]["nick"]
+			-- local Count = 0
+			-- local Number = 1
 
-			-- 	-- Inserção das tabelas padrões da rodada, caso não existam
-			-- 	if not Games["data"][Match]["rounds"]["data"][Round] then
-			-- 		Games["data"][Match]["rounds"]["data"][Round] = {}
-			-- 	end
+			-- while true do
+			-- 	if type(Sender) == "string" and tostring(Number) ~= Sender or Number ~= Sender then
+			-- 		local Index = Number -- tostring(Number) -- Formatação caso o source precise ser em `string`, ao invés de `number`
 
-			-- 	if not Games["data"][Match]["rounds"]["data"][Round][Number] then
-			-- 		Games["data"][Match]["rounds"]["data"][Round][Number] = {}
-			-- 	end
+			-- 		-- Caso Sender seja `string`, será necessário utilizar a verificação comentada
+			-- 		local Nick = Games["data"][Match]["players"]["data"]["attackers"][Index] and Games["data"][Match]["players"]["data"]["attackers"][Index]["nick"] or Games["data"][Match]["players"]["data"]["defenders"][Index]["nick"] -- Games["data"][Match]["players"]["data"]["attackers"][tonumber(Index)] and Games["data"][Match]["players"]["data"]["attackers"][tonumber(Index)]["nick"] or Games["data"][Match]["players"]["data"]["defenders"][tonumber(Index)]["nick"]
+			-- 		local Icon = "Icon"
+			-- 		local Hit = Bones[tostring(math.random(0,20))] or Data["hitComponent"]
+			-- 		local Weapon = Weapons[Data["weaponType"]] or Data["weaponType"]
+			-- 		local Damage = math.random(10) or Data["weaponDamage"]
 
-			-- 	if not Games["data"][Match]["rounds"]["data"][Round][Number][Source] then
-			-- 		Games["data"][Match]["rounds"]["data"][Round][Number][Source] = {
-			-- 			["Nick"] = Nick,
-			-- 			["Icon"] = "Icon",
-			-- 			["Taken"] = {
-			-- 				["Total"] = 0,
-			-- 				["Head"] = {
-			-- 					["Total"] = 0,
-			-- 					["Hits"] = {}
-			-- 				},
-			-- 				["Upper"] = {
-			-- 					["Total"] = 0,
-			-- 					["Hits"] = {}
-			-- 				},
-			-- 				["Lower"] = {
-			-- 					["Total"] = 0,
-			-- 					["Hits"] = {}
-			-- 				}
-			-- 			},
-			-- 			["Dealt"] = {
-			-- 				["Total"] = 0,
-			-- 				["Head"] = {
-			-- 					["Total"] = 0,
-			-- 					["Hits"] = {}
-			-- 				},
-			-- 				["Upper"] = {
-			-- 					["Total"] = 0,
-			-- 					["Hits"] = {}
-			-- 				},
-			-- 				["Lower"] = {
-			-- 					["Total"] = 0,
-			-- 					["Hits"] = {}
-			-- 				}
-			-- 			}
-			-- 		}
-			-- 	end
+			-- 		-- Inserção das tabelas padrões da rodada, caso não existam
+			-- 		if not Games["data"][Match]["rounds"]["data"][Round] then
+			-- 			Games["data"][Match]["rounds"]["data"][Round] = {}
+			-- 		end
 
-			-- 	if not Games["data"][Match]["rounds"]["data"][Round][Source] then
-			-- 		Games["data"][Match]["rounds"]["data"][Round][Source] = {}
-			-- 	end
+			-- 		if not Games["data"][Match]["rounds"]["data"][Round][Index] then
+			-- 			Games["data"][Match]["rounds"]["data"][Round][Index] = {}
+			-- 		end
 
-			-- 	if not Games["data"][Match]["rounds"]["data"][Round][Source][Number] then
-			-- 		Games["data"][Match]["rounds"]["data"][Round][Source][Number] = {
-			-- 			["Nick"] = Nick,
-			-- 			["Icon"] = "Icon",
-			-- 			["Taken"] = {
-			-- 				["Total"] = 0,
-			-- 				["Head"] = {
+			-- 		if not Games["data"][Match]["rounds"]["data"][Round][Index][Source] then
+			-- 			Games["data"][Match]["rounds"]["data"][Round][Index][Source] = {
+			-- 				["Nick"] = Nick,
+			-- 				["Icon"] = Icon,
+			-- 				["Taken"] = {
 			-- 					["Total"] = 0,
-			-- 					["Hits"] = {}
+			-- 					["Head"] = {
+			-- 						["Total"] = 0,
+			-- 						["Hits"] = {}
+			-- 					},
+			-- 					["Upper"] = {
+			-- 						["Total"] = 0,
+			-- 						["Hits"] = {}
+			-- 					},
+			-- 					["Lower"] = {
+			-- 						["Total"] = 0,
+			-- 						["Hits"] = {}
+			-- 					}
 			-- 				},
-			-- 				["Upper"] = {
+			-- 				["Dealt"] = {
 			-- 					["Total"] = 0,
-			-- 					["Hits"] = {}
-			-- 				},
-			-- 				["Lower"] = {
-			-- 					["Total"] = 0,
-			-- 					["Hits"] = {}
-			-- 				}
-			-- 			},
-			-- 			["Dealt"] = {
-			-- 				["Total"] = 0,
-			-- 				["Head"] = {
-			-- 					["Total"] = 0,
-			-- 					["Hits"] = {}
-			-- 				},
-			-- 				["Upper"] = {
-			-- 					["Total"] = 0,
-			-- 					["Hits"] = {}
-			-- 				},
-			-- 				["Lower"] = {
-			-- 					["Total"] = 0,
-			-- 					["Hits"] = {}
+			-- 					["Head"] = {
+			-- 						["Total"] = 0,
+			-- 						["Hits"] = {}
+			-- 					},
+			-- 					["Upper"] = {
+			-- 						["Total"] = 0,
+			-- 						["Hits"] = {}
+			-- 					},
+			-- 					["Lower"] = {
+			-- 						["Total"] = 0,
+			-- 						["Hits"] = {}
+			-- 					}
 			-- 				}
 			-- 			}
-			-- 		}
+			-- 		end
+
+			-- 		if not Games["data"][Match]["rounds"]["data"][Round][Source] then
+			-- 			Games["data"][Match]["rounds"]["data"][Round][Source] = {}
+			-- 		end
+
+			-- 		if not Games["data"][Match]["rounds"]["data"][Round][Source][Index] then
+			-- 			Games["data"][Match]["rounds"]["data"][Round][Source][Index] = {
+			-- 				["Nick"] = Nick,
+			-- 				["Icon"] = Icon,
+			-- 				["Taken"] = {
+			-- 					["Total"] = 0,
+			-- 					["Head"] = {
+			-- 						["Total"] = 0,
+			-- 						["Hits"] = {}
+			-- 					},
+			-- 					["Upper"] = {
+			-- 						["Total"] = 0,
+			-- 						["Hits"] = {}
+			-- 					},
+			-- 					["Lower"] = {
+			-- 						["Total"] = 0,
+			-- 						["Hits"] = {}
+			-- 					}
+			-- 				},
+			-- 				["Dealt"] = {
+			-- 					["Total"] = 0,
+			-- 					["Head"] = {
+			-- 						["Total"] = 0,
+			-- 						["Hits"] = {}
+			-- 					},
+			-- 					["Upper"] = {
+			-- 						["Total"] = 0,
+			-- 						["Hits"] = {}
+			-- 					},
+			-- 					["Lower"] = {
+			-- 						["Total"] = 0,
+			-- 						["Hits"] = {}
+			-- 					}
+			-- 				}
+			-- 			}
+			-- 		end
+
+			-- 		Games["data"][Match]["rounds"]["data"][Round][Index][Source]["Dealt"]["Total"] += Damage
+			-- 		Games["data"][Match]["rounds"]["data"][Round][Index][Source]["Dealt"][Hit]["Total"] += Damage
+			-- 		Games["data"][Match]["rounds"]["data"][Round][Index][Source]["Dealt"][Hit]["Hits"][#Games["data"][Match]["rounds"]["data"][Round][Index][Source]["Dealt"][Hit]["Hits"] + 1] = Infos
+
+			-- 		Games["data"][Match]["rounds"]["data"][Round][Source][Index]["Weapon"] = Weapon
+			-- 		Games["data"][Match]["rounds"]["data"][Round][Source][Index]["Taken"]["Total"] += Damage
+			-- 		Games["data"][Match]["rounds"]["data"][Round][Source][Index]["Taken"][Hit]["Total"] += Damage
+			-- 		Games["data"][Match]["rounds"]["data"][Round][Source][Index]["Taken"][Hit]["Hits"][#Games["data"][Match]["rounds"]["data"][Round][Source][Index]["Taken"][Hit]["Hits"] + 1] = Infos
+
+			-- 		Count += 1
 			-- 	end
 
-			-- 	Games["data"][Match]["rounds"]["data"][Round][Number][Source]["Dealt"]["Total"] += Data["weaponDamage"]
-			-- 	Games["data"][Match]["rounds"]["data"][Round][Number][Source]["Dealt"][Hit]["Total"] += Data["weaponDamage"]
-			-- 	Games["data"][Match]["rounds"]["data"][Round][Number][Source]["Dealt"][Hit]["Hits"][#Games["data"][Match]["rounds"]["data"][Round][Number][Source]["Dealt"][Hit]["Hits"] + 1] = Infos
+			-- 	if Count >= 4 then
+			-- 		break
+			-- 	end
 
-			-- 	Games["data"][Match]["rounds"]["data"][Round][Source][Number]["Weapon"] = Weapon
-			-- 	Games["data"][Match]["rounds"]["data"][Round][Source][Number]["Taken"]["Total"] += Data["weaponDamage"]
-			-- 	Games["data"][Match]["rounds"]["data"][Round][Source][Number]["Taken"][Hit]["Total"] += Data["weaponDamage"]
-			-- 	Games["data"][Match]["rounds"]["data"][Round][Source][Number]["Taken"][Hit]["Hits"][#Games["data"][Match]["rounds"]["data"][Round][Source][Number]["Taken"][Hit]["Hits"] + 1] = Infos
+			-- 	Number += 1
 			-- end
 
             -- Trigger quanto jogador é morto, enviando todos os dados a serem mostrados para o mesmo
@@ -474,7 +499,16 @@ AddEventHandler("weaponDamageEvent",function(Sender,Data)
 				Games["data"][Match]["rounds"]["data"][Round][Sender][Source]["Dealt"]["Kill"] = "KILLED"
 				Games["data"][Match]["rounds"]["data"][Round][Source][Sender]["Taken"]["Kill"] = "KILLED"
 
-                TriggerClientEvent("deathEvent",Source,Games["data"][Match]["rounds"]["data"][Round][Source])
+				local Death = Games["data"][Match]["rounds"]["data"][Round][Source]
+
+				-- Caso seja requerido uma nova tabela indexada sequencialmente, será necessário realizar um loop onde irá percorrer a tabela e com os dados da mesma, criar uma nova
+				-- local Death = {}
+
+				-- for Index in pairs(Games["data"][Match]["rounds"]["data"][Round][Source]) do
+				-- 	Death[#Death + 1] = Games["data"][Match]["rounds"]["data"][Round][Source][Index]
+				-- end
+
+                TriggerClientEvent("deathEvent",Source,Death)
             end
         end
     end
